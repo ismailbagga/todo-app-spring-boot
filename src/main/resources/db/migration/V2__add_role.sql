@@ -1,0 +1,1 @@
+alter table app_user ADD COLUMN role VARCHAR(5) CHECK ( role in ('ADMIN','USER')) ;

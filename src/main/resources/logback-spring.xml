@@ -1,0 +1,6 @@
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <logger name="ismail.coding.todoappspring" level="INFO"/>
+    <logger name="org.springframework" level="INFO"/>
+</configuration>
