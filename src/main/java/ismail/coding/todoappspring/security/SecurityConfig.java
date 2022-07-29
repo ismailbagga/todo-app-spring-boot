@@ -1,10 +1,9 @@
 package ismail.coding.todoappspring.security;
 
-import ismail.coding.todoappspring.filters.AuthenticationFilter;
-import ismail.coding.todoappspring.jwt.JwtAuthenticationGenerator;
+import ismail.coding.todoappspring.filters.*;
+import ismail.coding.todoappspring.jwt.JwtConfiguration;
 import ismail.coding.todoappspring.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -14,34 +13,45 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurity  extends  WebSecurityConfigurerAdapter {
+public class SecurityConfig extends  WebSecurityConfigurerAdapter {
     private final UserServiceImpl userServiceImpl ;
     private final  PasswordEncoder passwordEncoder ;
-    private final JwtAuthenticationGenerator jwtAuthenticationGenerator ;
+    private final JwtConfiguration jwtConfiguration;
 
     @Autowired
-    public WebSecurity(UserServiceImpl userServiceImpl, PasswordEncoder passwordEncoder, JwtAuthenticationGenerator jwtAuthenticationGenerator) {
+    public SecurityConfig(UserServiceImpl userServiceImpl, PasswordEncoder passwordEncoder, JwtConfiguration jwtConfiguration) {
         this.userServiceImpl = userServiceImpl;
         this.passwordEncoder = passwordEncoder;
-        this.jwtAuthenticationGenerator = jwtAuthenticationGenerator;
+        this.jwtConfiguration = jwtConfiguration;
     }
-
-
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-          var authenticationFilter = new AuthenticationFilter(authenticationManagerBean(),jwtAuthenticationGenerator) ;
-          authenticationFilter.setFilterProcessesUrl("/api/v1/login");
-          http.csrf().disable() ;
-          http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) ;
-          http.authorizeRequests().antMatchers("/api/v1/**").permitAll() ;
-          http.authorizeRequests().anyRequest().authenticated() ;
-          http.addFilter(authenticationFilter) ;
-//          http.addFilterAfter(new AuthorizationFilter(),AuthorizationFilter.class) ;
+        var authenticationFilter = new AuthenticationFilter(authenticationManagerBean(), jwtConfiguration) ;
+        var authorizationFilter = new AuthorizationFilter(jwtConfiguration) ;
+        authenticationFilter.setFilterProcessesUrl("/api/v1/login");
+        Filter1 filter1 = new Filter1() ;
+        Filter2 filter2 = new Filter2() ;
+        Filter3 filter3 = new Filter3() ;
+
+
+        http.csrf().disable() ;
+        http.authorizeRequests()
+                .antMatchers("/api/v1/login").permitAll()
+                .antMatchers("/api/v1/users/public").permitAll() ;
+        http.authorizeRequests().anyRequest().authenticated() ;
+
+
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) ;
+
+        http.addFilter(authenticationFilter) ;
+        http.addFilterAfter(new Filter1(), UsernamePasswordAuthenticationFilter.class) ;
+        http.addFilterBefore(authorizationFilter,Filter1.class) ;
+
 
 
 

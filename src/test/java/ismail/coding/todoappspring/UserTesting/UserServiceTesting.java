@@ -2,21 +2,14 @@ package ismail.coding.todoappspring.UserTesting;
 
 import ismail.coding.todoappspring.dao.DaoForToDoApp;
 import ismail.coding.todoappspring.enums.Role;
-import ismail.coding.todoappspring.exception.ApiRequestException;
+import ismail.coding.todoappspring.jwt.JwtConfiguration;
 import ismail.coding.todoappspring.model.User;
 import ismail.coding.todoappspring.services.UserServiceImpl;
 import org.junit.jupiter.api.*;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.event.annotation.AfterTestClass;
-import org.springframework.test.context.event.annotation.BeforeTestClass;
-import org.springframework.test.context.event.annotation.BeforeTestExecution;
-import org.springframework.test.context.event.annotation.BeforeTestMethod;
 
 import java.util.List;
 
@@ -37,6 +30,8 @@ public class UserServiceTesting {
 
     @Autowired
     DaoForToDoApp daoForToDoApp ;
+    @Autowired
+    JwtConfiguration jwtConfiguration;
 
 
    @BeforeEach
@@ -89,7 +84,7 @@ public class UserServiceTesting {
     public  void test4()  {
        var daoForToDoApp1 = mock(DaoForToDoApp.class) ;
        daoForToDoApp1.jdbcTemplate = jdbcTemplate ;
-       var userService1 = new UserServiceImpl(daoForToDoApp1) ;
+       var userService1 = new UserServiceImpl(daoForToDoApp1, jwtConfiguration) ;
         when(daoForToDoApp1.findEmailAndUserName(anyString(), anyString())).thenReturn(
                 List.of(
                 )

@@ -1,6 +1,8 @@
 package ismail.coding.todoappspring.services;
 
+import ismail.coding.todoappspring.dto.TokensContainer;
 import ismail.coding.todoappspring.exception.ApiRequestException;
+import ismail.coding.todoappspring.jwt.JwtConfiguration;
 import ismail.coding.todoappspring.model.User;
 import ismail.coding.todoappspring.dao.DaoForToDoApp;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +24,13 @@ import java.util.Optional;
 @Slf4j
 public class UserServiceImpl implements  UserService , UserDetailsService {
     public final DaoForToDoApp daoToDoApp ;
+    private  final JwtConfiguration jwtConfiguration;
 
 
     @Autowired
-    public UserServiceImpl(DaoForToDoApp daoToDoApp) {
+    public UserServiceImpl(DaoForToDoApp daoToDoApp, JwtConfiguration jwtConfiguration) {
         this.daoToDoApp = daoToDoApp;
+        this.jwtConfiguration = jwtConfiguration;
     }
 
     @Override
@@ -42,7 +46,7 @@ public class UserServiceImpl implements  UserService , UserDetailsService {
     }
 
 
-    public void saveUser(User user) {
+    public TokensContainer saveUser(User user) {
         String username = user.getUsername();
         String email = user.getEmail()  ;
         List<User> list =
@@ -60,6 +64,7 @@ public class UserServiceImpl implements  UserService , UserDetailsService {
          }
         user.setPassword(passwordEncoder().encode(user.getPassword()));
          daoToDoApp.insertUser(user);
+         return  jwtConfiguration.generateToken(user);
 
 
     }
