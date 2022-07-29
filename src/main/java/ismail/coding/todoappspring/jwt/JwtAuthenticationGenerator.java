@@ -20,7 +20,7 @@ public class JwtAuthenticationGenerator {
     @Value("{spring.jwt.secret-key}")
     private String secretKey ;
     @Value("{spring.jwt.expiration-time}")
-    private  int expirationDurationInSeconds  ;
+    private  String expirationDurationInSeconds  ;
     
     
     public TokensContainer generateToken(User user) {
@@ -35,7 +35,7 @@ public class JwtAuthenticationGenerator {
         String refreshToken =  JWT.create()
                 .withSubject(user.getUsername())
                 .withIssuer("path-/api/v1/login")
-                .withExpiresAt(new Date(System.currentTimeMillis()+expirationDurationInSeconds))
+                .withExpiresAt(new Date(System.currentTimeMillis()+Integer.parseInt(expirationDurationInSeconds)))
                 .withIssuedAt(Instant.from(LocalDateTime.now()))
                 .withClaim("authorities",user.getAuthoritiesAsList())
                 .sign(algorithm) ;

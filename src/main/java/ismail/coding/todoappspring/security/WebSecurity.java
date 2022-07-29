@@ -1,6 +1,7 @@
 package ismail.coding.todoappspring.security;
 
 import ismail.coding.todoappspring.filters.AuthenticationFilter;
+import ismail.coding.todoappspring.jwt.JwtAuthenticationGenerator;
 import ismail.coding.todoappspring.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,20 +21,21 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurity  extends  WebSecurityConfigurerAdapter {
     private final UserServiceImpl userServiceImpl ;
     private final  PasswordEncoder passwordEncoder ;
-    private final AuthenticationFilter authenticationFilter ;
+    private final JwtAuthenticationGenerator jwtAuthenticationGenerator ;
 
     @Autowired
-    public WebSecurity(UserServiceImpl userServiceImpl, PasswordEncoder passwordEncoder, AuthenticationFilter authenticationFilter) {
+    public WebSecurity(UserServiceImpl userServiceImpl, PasswordEncoder passwordEncoder, JwtAuthenticationGenerator jwtAuthenticationGenerator) {
         this.userServiceImpl = userServiceImpl;
         this.passwordEncoder = passwordEncoder;
-        this.authenticationFilter = authenticationFilter;
+        this.jwtAuthenticationGenerator = jwtAuthenticationGenerator;
     }
 
 
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-            authenticationFilter.setFilterProcessesUrl("/api/v1/login");
+          var authenticationFilter = new AuthenticationFilter(authenticationManagerBean(),jwtAuthenticationGenerator) ;
+          authenticationFilter.setFilterProcessesUrl("/api/v1/login");
           http.csrf().disable() ;
           http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) ;
           http.authorizeRequests().antMatchers("/api/v1/**").permitAll() ;
@@ -52,7 +54,6 @@ public class WebSecurity  extends  WebSecurityConfigurerAdapter {
     }
 
     @Override
-    @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
