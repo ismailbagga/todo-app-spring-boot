@@ -28,6 +28,13 @@ public class ToDosController {
     @Autowired
     private ToDoService toDoService ;
 
+    @GetMapping("/all")
+    private ResponseEntity<?> getAllTasksForUser() {
+
+    }
+
+
+
     @PostMapping(
             path = "{userId}" ,
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}

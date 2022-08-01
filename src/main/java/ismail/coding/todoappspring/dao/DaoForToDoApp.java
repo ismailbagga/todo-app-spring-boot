@@ -9,7 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -108,13 +110,13 @@ public class DaoForToDoApp {
         return jdbcTemplate.query(sql,new UserMapper(),id).stream().findFirst();
     }
 
-    @Transactional(rollbackFor = ApiRequestException.class)
+
     public void insertTaskWithImage(ToDoModel toDoModel, ImageModel image) {
         var parameters = new MapSqlParameterSource() ;
         // ------ Image
-//        parameters.addValue("name",image.getName()) ;
-//        parameters.addValue("type",image.getType()) ;
-//        parameters.addValue("image",image.getImageBytes()) ;
+        parameters.addValue("name",image.getName()) ;
+        parameters.addValue("type",image.getType()) ;
+        parameters.addValue("image",image.getImageBytes()) ;
 //        parameters.addValue("task_id",image.getTaskId()) ;
         // ------ Task
         parameters.addValue("task_name",toDoModel.getTaskName()) ;
@@ -123,21 +125,29 @@ public class DaoForToDoApp {
         parameters.addValue("completed",toDoModel.getCompleted()) ;
         var sql = """
                 INSERT INTO todo(task_name,task_desc,user_id,completed) 
-                VALUES (?,?,?,?) returning id  
-                
-                
-                
+                VALUES (:task_name,:task_desc,:user_id,:completed)   ;
+                INSERT INTO images(name,type,image,task_id) 
+                values (:name,:type,:image, (SELECT lastval() ))  ;         
+     
                 """ ;
         try {
-
-            jdbcTemplate.update((con -> {
-                var ps = con.prepareStatement(sql, RETURN_GENERATED_KEYS) ;
-                ps.setString(1,toDoModel.getTaskName());
-                ps.setString(2,toDoModel.getTask_desc());
-                ps.setLong(3,toDoModel.getUserId());
-                ps.setBoolean(4,toDoModel.getCompleted());
-                return  ps ;
-            })) ;
+                    namedJdbcTemplate.update(
+                            sql,parameters) ;
+//                    jdbcTemplate.update(
+//                            (con -> {
+//                                var ps = con.prepareStatement(sql, RETURN_GENERATED_KEYS);
+////                To DO Parameters
+//                                ps.setString(1, toDoModel.getTaskName());
+//                                ps.setString(2, toDoModel.getTask_desc());
+//                                ps.setLong(3, toDoModel.getUserId());
+//                                ps.setBoolean(4, toDoModel.getCompleted());
+////                Image Parameters
+//                                ps.setString(5, image.getName());
+//                                ps.setString(6, image.getType());
+//                                ps.setBytes(7, image.getImageBytes());
+//
+//                                return ps;
+//                            }));
         }
         catch (Exception e) {
             throw  e ;
