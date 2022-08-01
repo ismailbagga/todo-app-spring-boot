@@ -3,31 +3,39 @@ package ismail.coding.todoappspring.dao;
 import ismail.coding.todoappspring.exception.ApiRequestException;
 import ismail.coding.todoappspring.model.ApplicationUser;
 import ismail.coding.todoappspring.mappers.UserMapper;
+import ismail.coding.todoappspring.model.ImageModel;
+import ismail.coding.todoappspring.model.ToDoModel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static java.sql.Statement.*;
 
 
 @Repository
 @Slf4j
 public class DaoForToDoApp {
-    public JdbcTemplate jdbcTemplate ;
+    private  final  JdbcTemplate jdbcTemplate ;
+    private final NamedParameterJdbcTemplate namedJdbcTemplate ;
 
-
-    public DaoForToDoApp(JdbcTemplate jdbcTemplate) {
+    @Autowired
+    public DaoForToDoApp(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.namedJdbcTemplate = namedJdbcTemplate;
     }
 
 
@@ -55,7 +63,7 @@ public class DaoForToDoApp {
             jdbcTemplate.update(new PreparedStatementCreator() {
                 @Override
                 public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                    var ps =   con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS) ;
+                    var ps =   con.prepareStatement(sql, RETURN_GENERATED_KEYS) ;
                     ps.setString(1,applicationUser.getFullName()) ;
                     ps.setString(2,applicationUser.getUsername());
                     ps.setString(3,applicationUser.getBio());
@@ -90,5 +98,52 @@ public class DaoForToDoApp {
     }
     public void deleteAllUsers() {
         jdbcTemplate.update("delete from app_user ") ;
+    }
+
+    public Optional<ApplicationUser> findUserById(Long id ) {
+        var sql = """
+                    SELECT * FROM app_user 
+                    WHERE id = ? ; 
+                """ ;
+        return jdbcTemplate.query(sql,new UserMapper(),id).stream().findFirst();
+    }
+
+    @Transactional(rollbackFor = ApiRequestException.class)
+    public void insertTaskWithImage(ToDoModel toDoModel, ImageModel image) {
+        var parameters = new MapSqlParameterSource() ;
+        // ------ Image
+//        parameters.addValue("name",image.getName()) ;
+//        parameters.addValue("type",image.getType()) ;
+//        parameters.addValue("image",image.getImageBytes()) ;
+//        parameters.addValue("task_id",image.getTaskId()) ;
+        // ------ Task
+        parameters.addValue("task_name",toDoModel.getTaskName()) ;
+        parameters.addValue("task_desc",toDoModel.getTask_desc()) ;
+        parameters.addValue("user_id",toDoModel.getUserId()) ;
+        parameters.addValue("completed",toDoModel.getCompleted()) ;
+        var sql = """
+                INSERT INTO todo(task_name,task_desc,user_id,completed) 
+                VALUES (?,?,?,?) returning id  
+                
+                
+                
+                """ ;
+        try {
+
+            jdbcTemplate.update((con -> {
+                var ps = con.prepareStatement(sql, RETURN_GENERATED_KEYS) ;
+                ps.setString(1,toDoModel.getTaskName());
+                ps.setString(2,toDoModel.getTask_desc());
+                ps.setLong(3,toDoModel.getUserId());
+                ps.setBoolean(4,toDoModel.getCompleted());
+                return  ps ;
+            })) ;
+        }
+        catch (Exception e) {
+            throw  e ;
+//            throw  new ApiRequestException(e.getMessage(),HttpStatus.I_AM_A_TEAPOT) ;
+        }
+
+
     }
 }

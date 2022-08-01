@@ -82,16 +82,16 @@ public class ApplicationUserServiceTesting {
     }
     @Test
     public  void test4()  {
-       var daoForToDoApp1 = mock(DaoForToDoApp.class) ;
-       daoForToDoApp1.jdbcTemplate = jdbcTemplate ;
-       var userService1 = new UserServiceImpl(daoForToDoApp1, jwtConfiguration) ;
-        when(daoForToDoApp1.findEmailAndUserName(anyString(), anyString())).thenReturn(
-                List.of(
-                )
-        ) ;
-        ApplicationUser applicationUser = new ApplicationUser("sdqdqs","kim", "sdqdqs","kim@gmail.com",true,"sdqdqs", Role.USER) ;
-        doCallRealMethod().when(daoForToDoApp1).insertUser(any());
-        userService1.saveUser(applicationUser) ;
+//       var daoForToDoApp1 = mock(DaoForToDoApp.class) ;
+//       daoForToDoApp1.jdbcTemplate = jdbcTemplate ;
+//       var userService1 = new UserServiceImpl(daoForToDoApp1, jwtConfiguration) ;
+//        when(daoForToDoApp1.findEmailAndUserName(anyString(), anyString())).thenReturn(
+//                List.of(
+//                )
+//        ) ;
+//        ApplicationUser applicationUser = new ApplicationUser("sdqdqs","kim", "sdqdqs","kim@gmail.com",true,"sdqdqs", Role.USER) ;
+//        doCallRealMethod().when(daoForToDoApp1).insertUser(any());
+//        userService1.saveUser(applicationUser) ;
     }
 
 

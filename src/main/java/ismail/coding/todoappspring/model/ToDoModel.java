@@ -16,7 +16,7 @@ public class ToDoModel {
     private String task_desc  ;
     private LocalDateTime createdAt ;
     private LocalDateTime updateAt ;
-    private ImageModel image ;
+//    private ImageModel image ;
     private  Long userId ;
     private  Boolean completed ;
 }

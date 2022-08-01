@@ -39,21 +39,19 @@ public class ToDosController {
             @RequestPart("image") MultipartFile file) {
 
         var principal = getAuthenticatorUsername() ;
-        try {
+
 //            var toDoModel = new ObjectMapper().readValue(todoString,ToDoModel.class) ;
             if (
                     toDoModel.getUserId() ==  null  ||
                     ! Objects.equals(toDoModel.getUserId(), Objects.requireNonNull(principal).getId())) {
                 throw  new ApiRequestException("invalid ",HttpStatus.FAILED_DEPENDENCY) ;
             }
-            var image =  ImageModel.generateImageModel(file) ;
-            toDoModel.setImage(image);
-            return new ResponseEntity<>(toDoService.saveTask(toDoModel), HttpStatus.ACCEPTED);
 
-        } catch (IOException e) {
-            log.info("Error  parsing file : {} ",e.getMessage());
-            return ResponseEntity.badRequest().build() ;
-        }
+            return new ResponseEntity<>(
+                    toDoService.saveTask(toDoModel,file),
+                    HttpStatus.ACCEPTED);
+
+
 
 
 
