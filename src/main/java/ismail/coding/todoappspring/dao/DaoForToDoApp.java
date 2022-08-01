@@ -39,10 +39,6 @@ public class DaoForToDoApp {
         this.jdbcTemplate = jdbcTemplate;
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
-
-
-
-
     public Optional<ApplicationUser> findUserByUserName(String username)  {
         String sql = """
                SELECT id , full_name , username , bio , email ,enabled , password ,role 
@@ -50,16 +46,13 @@ public class DaoForToDoApp {
                WHERE username =  ?
                 """ ;
         return jdbcTemplate.query(sql,new UserMapper(),username).stream().findFirst() ;
-
     };
-
     public Long insertUser(ApplicationUser applicationUser) {
         log.info("called insert");
         String sql = """
                 insert into app_user (full_name,username,bio,email,enabled,password,role) 
                 values (?,?,?,?,?,?,?) returning id ;
-                
-                """ ;
+                    """ ;
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder() ;
             jdbcTemplate.update(new PreparedStatementCreator() {
@@ -78,15 +71,6 @@ public class DaoForToDoApp {
             },keyHolder) ;
             log.info("user generated id is : {}",keyHolder.getKey());
             return  Objects.requireNonNull(keyHolder.getKey()).longValue()  ;
-//            return jdbcTemplate.update(sql,
-//                    applicationUser.getFullName(),
-//                    applicationUser.getUsername(),
-//                    applicationUser.getBio(),
-//                    applicationUser.getEmail() ,
-//                    applicationUser.isEnabled() ,
-//                    applicationUser.getPassword() ,
-//                    applicationUser.getRole().name()
-//            ) ;
         }
         catch (Exception e) {
             throw  new ApiRequestException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR) ;
@@ -117,37 +101,33 @@ public class DaoForToDoApp {
         parameters.addValue("name",image.getName()) ;
         parameters.addValue("type",image.getType()) ;
         parameters.addValue("image",image.getImageBytes()) ;
-//        parameters.addValue("task_id",image.getTaskId()) ;
+
         // ------ Task
         parameters.addValue("task_name",toDoModel.getTaskName()) ;
         parameters.addValue("task_desc",toDoModel.getTask_desc()) ;
         parameters.addValue("user_id",toDoModel.getUserId()) ;
         parameters.addValue("completed",toDoModel.getCompleted()) ;
-        var sql = """
-                INSERT INTO todo(task_name,task_desc,user_id,completed) 
+        var sqlOp1 = """
+                  with userID as ( 
+                  
+                  INSERT INTO todo(task_name,task_desc,user_id,completed) 
+                  VALUES (:task_name,:task_desc,:user_id,:completed) returning id 
+                  ) 
+                         
+                    INSERT INTO images(name,type,image,task_id) 
+                    values (:name,:type,:image,(SELECT * FROM userID) )  ;  
+                """ ;
+        var sqlOp2 = """
+                
+              INSERT INTO todo(task_name,task_desc,user_id,completed) 
                 VALUES (:task_name,:task_desc,:user_id,:completed)   ;
                 INSERT INTO images(name,type,image,task_id) 
                 values (:name,:type,:image, (SELECT lastval() ))  ;         
      
                 """ ;
         try {
-                    namedJdbcTemplate.update(
-                            sql,parameters) ;
-//                    jdbcTemplate.update(
-//                            (con -> {
-//                                var ps = con.prepareStatement(sql, RETURN_GENERATED_KEYS);
-////                To DO Parameters
-//                                ps.setString(1, toDoModel.getTaskName());
-//                                ps.setString(2, toDoModel.getTask_desc());
-//                                ps.setLong(3, toDoModel.getUserId());
-//                                ps.setBoolean(4, toDoModel.getCompleted());
-////                Image Parameters
-//                                ps.setString(5, image.getName());
-//                                ps.setString(6, image.getType());
-//                                ps.setBytes(7, image.getImageBytes());
-//
-//                                return ps;
-//                            }));
+            namedJdbcTemplate.update(sqlOp1,parameters) ;
+
         }
         catch (Exception e) {
             throw  e ;

@@ -28,10 +28,10 @@ public class ToDosController {
     @Autowired
     private ToDoService toDoService ;
 
-    @GetMapping("/all")
-    private ResponseEntity<?> getAllTasksForUser() {
-
-    }
+//    @GetMapping("/all")
+//    private ResponseEntity<?> getAllTasksForUser() {
+//
+//    }
 
 
 
