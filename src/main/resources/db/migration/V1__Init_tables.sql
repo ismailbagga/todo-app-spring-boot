@@ -24,5 +24,5 @@ create  table  images (
     name varchar(100) ,
     type varchar(100) ,
     image bytea ,
-    task_id integer  references todo(id) ON DELETE CASCADE
+    task_id integer unique  references todo(id) ON DELETE CASCADE
 ) ;

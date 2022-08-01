@@ -1,6 +1,6 @@
 package ismail.coding.todoappspring;
 
-import ismail.coding.todoappspring.dao.DaoForToDoApp;
+import ismail.coding.todoappspring.dao.DaoForToDoApplication;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.*;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ApplicationEventListenerCustom {
     @Autowired
-    DaoForToDoApp daoForToDoApp ;
+    DaoForToDoApplication daoForToDoApplication;
     @Autowired
     PasswordEncoder passwordEncoder ;
     @EventListener(ContextRefreshedEvent.class)

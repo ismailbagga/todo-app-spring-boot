@@ -4,7 +4,7 @@ import ismail.coding.todoappspring.dto.TokensContainer;
 import ismail.coding.todoappspring.exception.ApiRequestException;
 import ismail.coding.todoappspring.jwt.JwtConfiguration;
 import ismail.coding.todoappspring.model.ApplicationUser;
-import ismail.coding.todoappspring.dao.DaoForToDoApp;
+import ismail.coding.todoappspring.dao.DaoForToDoApplication;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,12 +23,12 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class UserServiceImpl implements  UserService , UserDetailsService {
-    public final DaoForToDoApp daoToDoApp ;
+    public final DaoForToDoApplication daoToDoApp ;
     private  final JwtConfiguration jwtConfiguration;
 
 
     @Autowired
-    public UserServiceImpl(DaoForToDoApp daoToDoApp, JwtConfiguration jwtConfiguration) {
+    public UserServiceImpl(DaoForToDoApplication daoToDoApp, JwtConfiguration jwtConfiguration) {
         this.daoToDoApp = daoToDoApp;
         this.jwtConfiguration = jwtConfiguration;
     }

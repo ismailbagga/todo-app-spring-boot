@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class AuthenticationUtils {
 
-    public static UsernameUserIdPrincipal getAuthenticatorUsername () {
+    public static UsernameUserIdPrincipal getAuthenticatorPrincipal () {
         Authentication authentication
                 = SecurityContextHolder.getContext().getAuthentication() ;
         if ( authentication instanceof AnonymousAuthenticationToken) {

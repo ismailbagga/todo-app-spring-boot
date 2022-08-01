@@ -14,11 +14,11 @@ import static org.springframework.http.MediaType.*;
 @Data
 public class ImageModel {
 
-    private  int id ;
+    private  Long id ;
     private String name  ;
     private String type ;
     private byte[] imageBytes ;
-    private int taskId ;
+    private Long taskId ;
 
     public ImageModel(String name, String type, byte[] image) {
         this.name = name;

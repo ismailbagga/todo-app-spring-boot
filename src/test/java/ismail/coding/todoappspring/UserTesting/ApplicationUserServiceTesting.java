@@ -1,6 +1,6 @@
 package ismail.coding.todoappspring.UserTesting;
 
-import ismail.coding.todoappspring.dao.DaoForToDoApp;
+import ismail.coding.todoappspring.dao.DaoForToDoApplication;
 import ismail.coding.todoappspring.enums.Role;
 import ismail.coding.todoappspring.jwt.JwtConfiguration;
 import ismail.coding.todoappspring.model.ApplicationUser;
@@ -21,7 +21,7 @@ public class ApplicationUserServiceTesting {
     ApplicationUser applicationUser1, applicationUser2, applicationUser3;
 
     @Autowired
-    DaoForToDoApp preUser ;
+    DaoForToDoApplication preUser ;
 
     @Autowired
     JdbcTemplate jdbcTemplate ;
@@ -29,7 +29,7 @@ public class ApplicationUserServiceTesting {
     UserServiceImpl userService ;
 
     @Autowired
-    DaoForToDoApp daoForToDoApp ;
+    DaoForToDoApplication daoForToDoApplication;
     @Autowired
     JwtConfiguration jwtConfiguration;
 
@@ -47,36 +47,36 @@ public class ApplicationUserServiceTesting {
     @Test
     public void test1() {
         System.out.println("test 1");
-       when(daoForToDoApp.findEmailAndUserName(anyString(), anyString())).thenReturn(
+       when(daoForToDoApplication.findEmailAndUserName(anyString(), anyString())).thenReturn(
                List.of(
                        applicationUser1
                )
        ) ;
-       doNothing().when(daoForToDoApp).insertUser(any());
+       doNothing().when(daoForToDoApplication).insertUser(any());
        ApplicationUser applicationUser = new ApplicationUser("sdqdqs","mik", "sdqdqs","mike123@gmail.com",true,"sdqdqs", Role.USER) ;
        userService.saveUser(applicationUser) ;
 
    }
     @Test
     public  void test2()  {
-        when(daoForToDoApp.findEmailAndUserName(anyString(), anyString())).thenReturn(
+        when(daoForToDoApplication.findEmailAndUserName(anyString(), anyString())).thenReturn(
                 List.of(
                         applicationUser2
                 )
         ) ;
-        doNothing().when(daoForToDoApp).insertUser(any());
+        doNothing().when(daoForToDoApplication).insertUser(any());
         ApplicationUser applicationUser = new ApplicationUser("sdqdqs","james", "sdqdqs","james007@gmail.com",true,"sdqdqs", Role.USER) ;
         userService.saveUser(applicationUser) ;
     }
     @Test
     public  void test3()  {
-        when(daoForToDoApp.findEmailAndUserName(anyString(), anyString())).thenReturn(
+        when(daoForToDoApplication.findEmailAndUserName(anyString(), anyString())).thenReturn(
                 List.of(
                         applicationUser1,
                         applicationUser2
                 )
         ) ;
-        doNothing().when(daoForToDoApp).insertUser(any());
+        doNothing().when(daoForToDoApplication).insertUser(any());
         ApplicationUser applicationUser = new ApplicationUser("sdqdqs","james", "sdqdqs","mike123@gmail.com",true,"sdqdqs", Role.USER) ;
         userService.saveUser(applicationUser) ;
     }
