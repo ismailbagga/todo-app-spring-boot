@@ -1,7 +1,5 @@
 package ismail.coding.todoappspring;
 
-import ismail.coding.todoappspring.model.User;
-import ismail.coding.todoappspring.enums.Role;
 import ismail.coding.todoappspring.dao.DaoForToDoApp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +32,9 @@ public class ApplicationEventListenerCustom {
     }
     @EventListener(ContextClosedEvent.class)
     public void onClose() {
-//        log.info("Application Closed");
+        log.info("Application Closed");
 //        log.info("deleting everything in app user table");
-//        daoForToDoApp.deleteEverythingInUser() ;
+//        daoForToDoApp.deleteAllUsers() ;
     }
 
 

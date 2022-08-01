@@ -5,6 +5,7 @@ create table app_user (
 	bio VARCHAR(255) ,
 	email VARCHAR(255) UNIQUE,
 	enabled boolean DEFAULT true ,
+	role varchar(5) CHECK (role IN ('ADMIN','USER')),
 	password VARCHAR(500)
 	) ;
 
@@ -18,3 +19,10 @@ create table todo (
 	completed boolean DEFAULT true
 )
 ;
+create  table  images (
+    id serial PRIMARY KEY ,
+    name varchar(100) ,
+    type varchar(100) ,
+    image bytea ,
+    task_id integer  references todo(id) ON DELETE CASCADE
+) ;

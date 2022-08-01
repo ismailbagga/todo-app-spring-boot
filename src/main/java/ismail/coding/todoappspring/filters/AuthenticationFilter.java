@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ismail.coding.todoappspring.dto.TokensContainer;
 import ismail.coding.todoappspring.dto.UsernamePasswordAuthRequest;
 import ismail.coding.todoappspring.jwt.JwtConfiguration;
-import ismail.coding.todoappspring.model.User;
+import ismail.coding.todoappspring.model.ApplicationUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -56,11 +56,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             HttpServletResponse response,
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
-        User user = (User) authResult.getPrincipal() ;
-        // because loadUsersByUsername() return User as UserDetail
-        // so i can up cast ;
-        TokensContainer tokens  =  jwtConfiguration.generateToken(user) ;
-
+        ApplicationUser applicationUser = (ApplicationUser) authResult.getPrincipal() ;
+        TokensContainer tokens  =  jwtConfiguration.generateToken(applicationUser) ;
         response.addHeader(AUTHORIZATION_HEADER,tokens.getAccessToken());
         response.addHeader(ALTERNATIVE_AUTHORIZATION_HEADER,tokens.getRefreshToken());
 

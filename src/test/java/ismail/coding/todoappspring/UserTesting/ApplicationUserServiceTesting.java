@@ -3,7 +3,7 @@ package ismail.coding.todoappspring.UserTesting;
 import ismail.coding.todoappspring.dao.DaoForToDoApp;
 import ismail.coding.todoappspring.enums.Role;
 import ismail.coding.todoappspring.jwt.JwtConfiguration;
-import ismail.coding.todoappspring.model.User;
+import ismail.coding.todoappspring.model.ApplicationUser;
 import ismail.coding.todoappspring.services.UserServiceImpl;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +17,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class UserServiceTesting {
-    User user1 , user2  , user3;
+public class ApplicationUserServiceTesting {
+    ApplicationUser applicationUser1, applicationUser2, applicationUser3;
 
     @Autowired
     DaoForToDoApp preUser ;
@@ -39,8 +39,8 @@ public class UserServiceTesting {
 //       preUser.deleteEverythingInUser();
 //       daoForToDoApp = new DaoForToDoApp()
        System.out.println("called");
-       user1 = new User("123dsq","mi", "sdqdqs","mike123@gmail.com",true,"sdqdqs", Role.USER) ;
-       user2 = new User("sdqdqs","james", "sdqdqs","james@gmail.com",true,"sdqdqs", Role.USER);
+       applicationUser1 = new ApplicationUser("123dsq","mi", "sdqdqs","mike123@gmail.com",true,"sdqdqs", Role.USER) ;
+       applicationUser2 = new ApplicationUser("sdqdqs","james", "sdqdqs","james@gmail.com",true,"sdqdqs", Role.USER);
    }
 
 
@@ -49,36 +49,36 @@ public class UserServiceTesting {
         System.out.println("test 1");
        when(daoForToDoApp.findEmailAndUserName(anyString(), anyString())).thenReturn(
                List.of(
-                       user1
+                       applicationUser1
                )
        ) ;
        doNothing().when(daoForToDoApp).insertUser(any());
-       User user = new User("sdqdqs","mik", "sdqdqs","mike123@gmail.com",true,"sdqdqs", Role.USER) ;
-       userService.saveUser(user) ;
+       ApplicationUser applicationUser = new ApplicationUser("sdqdqs","mik", "sdqdqs","mike123@gmail.com",true,"sdqdqs", Role.USER) ;
+       userService.saveUser(applicationUser) ;
 
    }
     @Test
     public  void test2()  {
         when(daoForToDoApp.findEmailAndUserName(anyString(), anyString())).thenReturn(
                 List.of(
-                        user2
+                        applicationUser2
                 )
         ) ;
         doNothing().when(daoForToDoApp).insertUser(any());
-        User user = new User("sdqdqs","james", "sdqdqs","james007@gmail.com",true,"sdqdqs", Role.USER) ;
-        userService.saveUser(user) ;
+        ApplicationUser applicationUser = new ApplicationUser("sdqdqs","james", "sdqdqs","james007@gmail.com",true,"sdqdqs", Role.USER) ;
+        userService.saveUser(applicationUser) ;
     }
     @Test
     public  void test3()  {
         when(daoForToDoApp.findEmailAndUserName(anyString(), anyString())).thenReturn(
                 List.of(
-                        user1,
-                        user2
+                        applicationUser1,
+                        applicationUser2
                 )
         ) ;
         doNothing().when(daoForToDoApp).insertUser(any());
-        User user = new User("sdqdqs","james", "sdqdqs","mike123@gmail.com",true,"sdqdqs", Role.USER) ;
-        userService.saveUser(user) ;
+        ApplicationUser applicationUser = new ApplicationUser("sdqdqs","james", "sdqdqs","mike123@gmail.com",true,"sdqdqs", Role.USER) ;
+        userService.saveUser(applicationUser) ;
     }
     @Test
     public  void test4()  {
@@ -89,9 +89,9 @@ public class UserServiceTesting {
                 List.of(
                 )
         ) ;
-        User user = new User("sdqdqs","kim", "sdqdqs","kim@gmail.com",true,"sdqdqs", Role.USER) ;
+        ApplicationUser applicationUser = new ApplicationUser("sdqdqs","kim", "sdqdqs","kim@gmail.com",true,"sdqdqs", Role.USER) ;
         doCallRealMethod().when(daoForToDoApp1).insertUser(any());
-        userService1.saveUser(user) ;
+        userService1.saveUser(applicationUser) ;
     }
 
 

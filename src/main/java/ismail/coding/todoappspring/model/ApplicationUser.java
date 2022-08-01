@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class User implements UserDetails {
+public class ApplicationUser implements UserDetails {
 
 
     private Long id ;
@@ -26,8 +26,8 @@ public class User implements UserDetails {
     private String password ;
     private Role role ;
 
-    public User(String fullName,
-                String username, String bio, String email, boolean enabled, String password, Role role) {
+    public ApplicationUser(String fullName,
+                           String username, String bio, String email, boolean enabled, String password, Role role) {
         this.fullName = fullName;
         this.username = username;
         this.bio = bio;

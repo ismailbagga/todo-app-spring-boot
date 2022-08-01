@@ -2,6 +2,7 @@ package ismail.coding.todoappspring.filters;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import ismail.coding.todoappspring.jwt.JwtConfiguration;
+import ismail.coding.todoappspring.model.UsernameUserIdPrincipal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -46,11 +47,13 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             throw  new ServletException("fake token") ;
         }
 
-        String username = decodedJWT.getSubject() ;
+        var principal = new UsernameUserIdPrincipal(
+                Long.parseLong(decodedJWT.getClaim("userId").toString()),
+                decodedJWT.getSubject() );
         List<SimpleGrantedAuthority> authorities =
                 jwtConfiguration.extractAuthorities(decodedJWT) ;
         var authToken =
-                new UsernamePasswordAuthenticationToken(username,null,authorities) ;
+                new UsernamePasswordAuthenticationToken(principal,null,authorities) ;
         SecurityContextHolder.getContext().setAuthentication(authToken);
         log.info("user is authenticated");
         filterChain.doFilter(request,response);

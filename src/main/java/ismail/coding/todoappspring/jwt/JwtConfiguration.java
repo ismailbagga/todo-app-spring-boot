@@ -6,11 +6,10 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import ismail.coding.todoappspring.dto.TokensContainer;
-import ismail.coding.todoappspring.model.User;
+import ismail.coding.todoappspring.model.ApplicationUser;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -37,20 +36,21 @@ public class JwtConfiguration {
 
 
 
-    public TokensContainer generateToken(User user) {
+    public TokensContainer generateToken(ApplicationUser applicationUser) {
         var algorithm = Algorithm.HMAC256(secretKey) ;
         log.info("expiration time is {}",expirationDurationInSeconds);
         log.info("secret key is {}",secretKey);
         List<String> authorities =
-                user.getAuthoritiesAsList().stream().map(SimpleGrantedAuthority::getAuthority).collect(Collectors.toList()) ;
+                applicationUser.getAuthoritiesAsList().stream().map(SimpleGrantedAuthority::getAuthority).collect(Collectors.toList()) ;
         String accessToken = JWT.create()
-                .withSubject(user.getUsername())
+                .withSubject(applicationUser.getUsername())
                 .withIssuer("path-/api/v1/login")
-                .withExpiresAt(new Date(System.currentTimeMillis()+1000*60*10))
+                .withExpiresAt(new Date(System.currentTimeMillis()+1000*60*60*2)) // 2 hours
+                .withClaim("userId", applicationUser.getId())
                 .withClaim(AUTHORITIES_CLAIM,authorities)
                 .sign(algorithm) ;
         String refreshToken =  JWT.create()
-                .withSubject(user.getUsername())
+                .withSubject(applicationUser.getUsername())
                 .withIssuer("path-/api/v1/login")
                 .withExpiresAt(new Date(System.currentTimeMillis()+expirationDurationInSeconds))
                 .withClaim(AUTHORITIES_CLAIM,authorities)
