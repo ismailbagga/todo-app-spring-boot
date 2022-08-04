@@ -29,13 +29,13 @@ public class ImageModel {
     public static ImageModel generateImageModel(MultipartFile file) throws IOException ,IllegalStateException{
         isFileEmpty(file);
         isFileImage(file);
-        return new ImageModel(file.getName(),file.getContentType(),file.getBytes()) ;
+        return new ImageModel(file.getOriginalFilename(),file.getContentType(),file.getBytes()) ;
 
     }
 
     private static void isFileImage(MultipartFile file) {
         String type = file.getContentType();
-        if ( List.of(IMAGE_JPEG,IMAGE_PNG,IMAGE_GIF).contains(type)) {
+        if (! List.of(IMAGE_JPEG_VALUE,IMAGE_PNG_VALUE,IMAGE_GIF_VALUE).contains(type)) {
                  throw new  IllegalStateException("File must be image") ;
              }
     }

@@ -1,0 +1,1 @@
+ALTER TABLE todo RENAME COLUMN updated_at TO update_at ;

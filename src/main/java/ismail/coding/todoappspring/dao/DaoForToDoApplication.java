@@ -175,7 +175,7 @@ public class DaoForToDoApplication {
     public void updateTask(UpdateTaskRequest request) {
         var sql = """
                 UPDATE todo SET task_name = ? , task_desc = ? , completed = ? ,
-                updated_at = CURRENT_TIMESTAMP WHERE id = ?
+                updated_at = CURRENT_TIMESTAMP WHERE id = ? ;
                 """ ;
         jdbcTemplate.update(sql,request.getTaskName(),request.getTaskDesc(),request.getCompleted(),request.getTaskId()) ;
     }

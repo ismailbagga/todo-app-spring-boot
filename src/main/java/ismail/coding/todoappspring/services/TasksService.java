@@ -4,7 +4,6 @@ import ismail.coding.todoappspring.dto.UpdateTaskRequest;
 import ismail.coding.todoappspring.exception.ApiRequestException;
 import ismail.coding.todoappspring.model.ImageModel;
 import ismail.coding.todoappspring.model.TaskModel;
-import ismail.coding.todoappspring.security.AuthenticationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,12 +20,12 @@ import static ismail.coding.todoappspring.security.AuthenticationUtils.getAuthen
 
 @Service
 @Slf4j
-public class ToDoService {
+public class TasksService {
 
     private final DaoForToDoApplication daoForToDoApplication;
 
     @Autowired
-    public ToDoService(DaoForToDoApplication daoForToDoApplication) {
+    public TasksService(DaoForToDoApplication daoForToDoApplication) {
         this.daoForToDoApplication = daoForToDoApplication;
     }
 
@@ -81,7 +80,7 @@ public class ToDoService {
             throw new ApiRequestException("there is no task with id of "+taskId,HttpStatus.NOT_FOUND) ;
 
         // check if task belongs to the user
-        if (Objects.requireNonNull(getAuthenticatorPrincipal()).getId() == task.get().getUserId() )
+        if (Objects.requireNonNull(getAuthenticatorPrincipal()).getId() != task.get().getUserId() )
             throw new ApiRequestException("accessing a task don't belongs to the user",HttpStatus.BAD_GATEWAY) ;
         //delete  the user
         daoForToDoApplication.deleteTask(taskId);
@@ -90,30 +89,34 @@ public class ToDoService {
 
     @Transactional
     public void  updateTask(UpdateTaskRequest request) {
+        //Check if request us null
+        if (request.getTaskId() == null)
+            throw  new ApiRequestException("request must contain a task id ",HttpStatus.PARTIAL_CONTENT) ;
         // Check if task exists
         Optional<TaskModel> task =
                 daoForToDoApplication.getSimpleTask(request.getTaskId()) ;
         if ( task.isEmpty())
             throw new ApiRequestException("there is no task with id of "+request.getTaskId(),HttpStatus.NOT_FOUND) ;
         // check if task belong to the user
-        if (Objects.requireNonNull(getAuthenticatorPrincipal()).getId() == task.get().getUserId() )
+        if (Objects.requireNonNull(getAuthenticatorPrincipal()).getId() != task.get().getUserId() )
             throw new ApiRequestException("accessing a task don't belongs to the user",HttpStatus.BAD_GATEWAY) ;
 
-        int  updateTask = 0 ;
+        int  updateTaskCount = 0 ;
         if ( ! request.shouldIUpdateTaskName()) {
             request.setTaskName(task.get().getTaskName());
-            updateTask++;
+            updateTaskCount++;
         }
         if(  ! request.shouldIUpdateTaskDesc()) {
              request.setTaskDesc(task.get().getTask_desc());
-            updateTask++;
+            updateTaskCount++;
 
         }
         if (  ! request.shouldIUpdateComplete()) {
             request.setCompleted(task.get().getCompleted());
-            updateTask++;
+            updateTaskCount++;
         }
-        if ( updateTask != 3 ) {
+        if ( updateTaskCount != 3 ) {
+            log.info("update user task meta data");
             daoForToDoApplication.updateTask(request) ;
         }
 
@@ -121,6 +124,7 @@ public class ToDoService {
         try {
                 var image =  ImageModel.generateImageModel(request.getImage()) ;
                 image.setTaskId(task.get().getId());
+                log.info("update user image");
                 daoForToDoApplication.updateTaskImage(image) ;
 
         }
@@ -139,11 +143,7 @@ public class ToDoService {
     }
 
 
-    private  String generateQuery(String colName) {
-        String prefix = "SET " ;
-        String suffix = "= ? ," ;
-        return prefix  + colName + suffix ;
-    }
+
 
     ;
 }

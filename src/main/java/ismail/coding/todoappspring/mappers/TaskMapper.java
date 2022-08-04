@@ -10,8 +10,6 @@ import java.sql.SQLException;
 public class TaskMapper implements RowMapper<TaskModel> {
     private  final int  moveRowBy = 0 ;
 
-
-
     @Override
     public TaskModel mapRow(ResultSet rs, int rowNum) throws SQLException {
 
