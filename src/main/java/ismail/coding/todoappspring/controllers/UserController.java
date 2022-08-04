@@ -1,6 +1,7 @@
 package ismail.coding.todoappspring.controllers;
 
-import ismail.coding.todoappspring.dto.UpdateUserProfile;
+import ismail.coding.todoappspring.dto.UpdateUserPasswordRequest;
+import ismail.coding.todoappspring.dto.UpdateUserProfileRequest;
 import ismail.coding.todoappspring.dto.UserRequest;
 import ismail.coding.todoappspring.model.ApplicationUser;
 import ismail.coding.todoappspring.services.UserServiceImpl;
@@ -40,9 +41,14 @@ public class UserController {
     public ResponseEntity<?> getUser() {
         return  new ResponseEntity<UserRequest>(userService.findUser(), HttpStatus.ACCEPTED) ;
     }
-    @PatchMapping()
-    public ResponseEntity<?> updateUser(@RequestBody UpdateUserProfile updateUserProfile) {
-        userService.updateUser(updateUserProfile) ;
+    @PatchMapping("/profile")
+    public ResponseEntity<?> updateUserProfile(@RequestBody UpdateUserProfileRequest updateUserProfileRequest) {
+        userService.updateUser(updateUserProfileRequest) ;
+        return  ResponseEntity.ok().build() ;
+    }
+    @PatchMapping("/password")
+    public ResponseEntity<?> updateUserPassword(@RequestBody UpdateUserPasswordRequest updateUserPasswordRequest) {
+        userService.changePassword(updateUserPasswordRequest); ;
         return  ResponseEntity.ok().build() ;
     }
 

@@ -2,7 +2,8 @@ package ismail.coding.todoappspring.services;
 
 import ismail.coding.todoappspring.dao.UsersDao;
 import ismail.coding.todoappspring.dto.TokensContainer;
-import ismail.coding.todoappspring.dto.UpdateUserProfile;
+import ismail.coding.todoappspring.dto.UpdateUserPasswordRequest;
+import ismail.coding.todoappspring.dto.UpdateUserProfileRequest;
 import ismail.coding.todoappspring.dto.UserRequest;
 import ismail.coding.todoappspring.exception.ApiRequestException;
 import ismail.coding.todoappspring.jwt.JwtConfiguration;
@@ -77,7 +78,7 @@ public class UserServiceImpl implements  UserService , UserDetailsService {
         var principal = AuthenticationUtils.getAuthenticatorPrincipal() ;
         if ( principal == null ) throw  new ApiRequestException("no principal found",HttpStatus.FAILED_DEPENDENCY) ;
 
-        Optional<ApplicationUser> user =  usersDao.findUserByUserName(principal.getUsername())  ;
+        Optional<ApplicationUser> user =  usersDao.findUserById(principal.getId())  ;
         if(user.isEmpty()) throw  new ApiRequestException("there is no user with this data",HttpStatus.NOT_FOUND) ;
 
         return user.get().generateRequestUser() ;
@@ -85,15 +86,15 @@ public class UserServiceImpl implements  UserService , UserDetailsService {
 
     }
 
-    public void updateUser(UpdateUserProfile newProfile) {
+    public void updateUser(UpdateUserProfileRequest newProfile) {
         var principal = AuthenticationUtils.getAuthenticatorPrincipal() ;
         if ( principal == null ) throw  new ApiRequestException("no principal found",HttpStatus.FAILED_DEPENDENCY) ;
         if ( newProfile.shouldIIgnore())
             return ;
-        var user = usersDao.findUserById(principal.getId()) ;
-        if ( user.isEmpty() ) throw new ApiRequestException("no user found",HttpStatus.NOT_FOUND) ;
-        if(!passwordEncoder().matches(newProfile.getConfirmationPassword(),user.get().getPassword()) )
-            throw new ApiRequestException("wrong password",HttpStatus.NOT_ACCEPTABLE) ;
+
+
+        validatePassword(newProfile.getConfirmationPassword(),
+                principal.getId());
         if (newProfile.getEmail() != null || newProfile.getUsername() != null) {
            validateUsernameAndEmail(
                    newProfile.getUsername(),
@@ -105,8 +106,24 @@ public class UserServiceImpl implements  UserService , UserDetailsService {
         int rowUpdated = usersDao.updateUser(newProfile,principal.getId()) ;
     }
 
-    private void validateUsernameAndEmailIgnoringThisUser(String username, String email) {
+    private void validatePassword(String p1,Long userId) {
+        ApplicationUser user =
+                usersDao.findUserById(userId)
+                        .orElseThrow(
+                                ()-> new ApiRequestException("no user found",HttpStatus.NOT_FOUND)
+                        );
+        if(!passwordEncoder().matches(p1,user.getPassword()))
+            throw new ApiRequestException("wrong password",HttpStatus.NOT_ACCEPTABLE) ;
+    }
 
-
+    public  void changePassword(UpdateUserPasswordRequest request) {
+        var principal = AuthenticationUtils.getAuthenticatorPrincipal() ;
+        if( principal == null) throw  new ApiRequestException("principal is messing",HttpStatus.BAD_GATEWAY) ;
+        validatePassword(request.getOldPassword(),principal.getId());
+        usersDao
+                .updatePassword(
+                        passwordEncoder()
+                                .encode(request.getNewPassword()),
+                        principal.getId()) ;
     }
 }

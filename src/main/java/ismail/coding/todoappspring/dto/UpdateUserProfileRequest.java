@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 
 @Data
 @AllArgsConstructor
-public class UpdateUserProfile {
+public class UpdateUserProfileRequest {
     private String fullName ;
     private String username ;
     private String bio ;

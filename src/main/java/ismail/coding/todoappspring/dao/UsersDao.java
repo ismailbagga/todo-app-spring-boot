@@ -1,6 +1,6 @@
 package ismail.coding.todoappspring.dao;
 
-import ismail.coding.todoappspring.dto.UpdateUserProfile;
+import ismail.coding.todoappspring.dto.UpdateUserProfileRequest;
 import ismail.coding.todoappspring.exception.ApiRequestException;
 import ismail.coding.todoappspring.mappers.UserMapper;
 import ismail.coding.todoappspring.model.ApplicationUser;
@@ -14,7 +14,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -41,7 +40,7 @@ public class UsersDao {
 
     public Optional<ApplicationUser> findUserByUserName(String username)  {
         String sql = """
-               SELECT id , full_name , username , bio , email ,enabled , password ,role 
+               SELECT *
                FROM app_user 
                WHERE username =  ?
                 """ ;
@@ -110,7 +109,7 @@ public class UsersDao {
                 """ ;
         return jdbcTemplate.query(sql,new UserMapper(),id).stream().findFirst();
     }
-    public int updateUser(UpdateUserProfile newProfile, Long userId) {
+    public int updateUser(UpdateUserProfileRequest newProfile, Long userId) {
         var sql = """
                 UPDATE app_user SET
                 full_name = CASE WHEN cast(:fullName as varchar) IS NULL THEN full_name ELSE :fullName END ,
@@ -130,5 +129,16 @@ public class UsersDao {
     }
 
 
+    public int updatePassword(String bcryptNewPassword, Long userId) {
+        var sql = """
+                UPDATE app_user SET
+                password = :password 
+                WHERE id =  :userId; 
+                """ ;
+        var parameters = new MapSqlParameterSource() ;
+        parameters.addValue("password",bcryptNewPassword) ;
+        parameters.addValue("userId",userId) ;
 
+        return namedJdbcTemplate.update(sql,parameters);
+    }
 }

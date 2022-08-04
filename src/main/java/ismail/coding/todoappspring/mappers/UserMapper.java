@@ -20,8 +20,8 @@ public class UserMapper implements RowMapper<ApplicationUser> {
                 rs.getString(4),
                 rs.getString(5),
                 rs.getBoolean(6),
-                rs.getString(8),
-                rs.getString(7).equals("ADMIN")? Role.ADMIN : Role.USER
+                rs.getString(7).equals("ADMIN")? Role.ADMIN : Role.USER,
+                rs.getString(8)
                 ) ;
     }
 }

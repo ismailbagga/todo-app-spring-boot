@@ -24,16 +24,18 @@ public class ApplicationUser implements UserDetails {
     private String bio  ;
     private  String email  ;
     private boolean enabled = true ;
-    private String password ;
     private Role role ;
+    private String password ;
 
     public ApplicationUser(String fullName,
                            String username,
                            String bio,
                            String email,
                            boolean enabled,
-                           String password,
-                           Role role) {
+                           Role role ,
+                           String password
+
+    ) {
         this.fullName = fullName;
         this.username = username;
         this.bio = bio;
