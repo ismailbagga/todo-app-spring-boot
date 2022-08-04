@@ -1,9 +1,9 @@
 create table app_user (
 	id  SERIAL PRIMARY KEY ,
 	full_name VARCHAR(50) ,
-	username VARCHAR(20) unique ,
+	username VARCHAR(20) unique NOT NULL ,
 	bio VARCHAR(255) ,
-	email VARCHAR(255) UNIQUE,
+	email VARCHAR(255) UNIQUE NOT NULL,
 	enabled boolean DEFAULT true ,
 	role varchar(5) CHECK (role IN ('ADMIN','USER')),
 	password VARCHAR(500)

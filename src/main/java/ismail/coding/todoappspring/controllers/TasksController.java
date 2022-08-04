@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,11 +27,13 @@ public class TasksController {
     @Autowired
     private TasksService tasksService;
 
-    @GetMapping("/all")
-    private ResponseEntity<?> getAllTasksForUser() {
+    @GetMapping(value = "/all")
+    private ResponseEntity<?> getAllTasksForUser(@RequestParam(value = "p",required = false) Integer page) {
+        if (page == null ) page = 0 ;
+
         var principal = getAuthenticatorPrincipal() ;
         return new ResponseEntity<List<TaskModel>>(
-                tasksService.getAllTasksForUser(1L)
+                tasksService.getAllTasksForUser(1L,page)
                 ,HttpStatus.ACCEPTED )  ;
     }
     @GetMapping(value = "/task/{taskId}")

@@ -11,8 +11,8 @@ import java.sql.SQLException;
 public class UserMapper implements RowMapper<ApplicationUser> {
     @Override
     public ApplicationUser mapRow(ResultSet rs, int rowNum) throws SQLException {
-        log.info(String.format("id is %s",rs.getString(1)));
-        log.debug("i");
+        log.debug(String.format("USER ID IS [ %s ]",rs.getString(1)));
+        log.debug(String.format("USER PASSWORD IS [ %s ]",rs.getString(8)));
         return  new ApplicationUser(
                 rs.getLong(1) ,
                 rs.getString(2) ,
@@ -20,8 +20,8 @@ public class UserMapper implements RowMapper<ApplicationUser> {
                 rs.getString(4),
                 rs.getString(5),
                 rs.getBoolean(6),
-                rs.getString(7),
-                rs.getString(8).equals("ADMIN")? Role.ADMIN : Role.USER
-        ) ;
+                rs.getString(8),
+                rs.getString(7).equals("ADMIN")? Role.ADMIN : Role.USER
+                ) ;
     }
 }

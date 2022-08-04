@@ -1,5 +1,6 @@
 package ismail.coding.todoappspring.model;
 
+import ismail.coding.todoappspring.dto.UserRequest;
 import ismail.coding.todoappspring.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,7 +28,12 @@ public class ApplicationUser implements UserDetails {
     private Role role ;
 
     public ApplicationUser(String fullName,
-                           String username, String bio, String email, boolean enabled, String password, Role role) {
+                           String username,
+                           String bio,
+                           String email,
+                           boolean enabled,
+                           String password,
+                           Role role) {
         this.fullName = fullName;
         this.username = username;
         this.bio = bio;
@@ -72,5 +78,14 @@ public class ApplicationUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public UserRequest generateRequestUser() {
+        return  UserRequest.builder()
+                .fullName(fullName)
+                .username(username)
+                .email(email)
+                .bio(bio)
+                .build() ;
     }
 }

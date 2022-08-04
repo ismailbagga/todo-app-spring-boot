@@ -4,93 +4,33 @@ import ismail.coding.todoappspring.dto.UpdateTaskRequest;
 import ismail.coding.todoappspring.exception.ApiRequestException;
 import ismail.coding.todoappspring.mappers.ImageTaskMapper;
 import ismail.coding.todoappspring.mappers.TaskMapper;
-import ismail.coding.todoappspring.model.ApplicationUser;
-import ismail.coding.todoappspring.mappers.UserMapper;
 import ismail.coding.todoappspring.model.ImageModel;
 import ismail.coding.todoappspring.model.TaskModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-
-import static java.sql.Statement.*;
 
 
 @Repository
 @Slf4j
-public class DaoForToDoApplication {
+public class TasksDao {
     private  final  JdbcTemplate jdbcTemplate ;
     private final NamedParameterJdbcTemplate namedJdbcTemplate ;
 
+
+    private final int TASKS_PER_PAGE = 2 ;
+
     @Autowired
-    public DaoForToDoApplication(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate) {
+    public TasksDao(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.namedJdbcTemplate = namedJdbcTemplate;
-    }
-    public Optional<ApplicationUser> findUserByUserName(String username)  {
-        String sql = """
-               SELECT id , full_name , username , bio , email ,enabled , password ,role 
-               FROM app_user 
-               WHERE username =  ?
-                """ ;
-        return jdbcTemplate.query(sql,new UserMapper(),username).stream().findFirst() ;
-    };
-    public Long insertUser(ApplicationUser applicationUser) {
-        log.info("called insert");
-        String sql = """
-                insert into app_user (full_name,username,bio,email,enabled,password,role) 
-                values (?,?,?,?,?,?,?) returning id ;
-                    """ ;
-        try {
-            KeyHolder keyHolder = new GeneratedKeyHolder() ;
-            jdbcTemplate.update(new PreparedStatementCreator() {
-                @Override
-                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                    var ps =   con.prepareStatement(sql, RETURN_GENERATED_KEYS) ;
-                    ps.setString(1,applicationUser.getFullName()) ;
-                    ps.setString(2,applicationUser.getUsername());
-                    ps.setString(3,applicationUser.getBio());
-                    ps.setString(4,applicationUser.getEmail() );
-                    ps.setBoolean(5,applicationUser.isEnabled() );
-                    ps.setString(6,applicationUser.getPassword() );
-                    ps.setString(7,applicationUser.getRole().name());
-                    return ps ;
-                }
-            },keyHolder) ;
-            log.info("user generated id is : {}",keyHolder.getKey());
-            return  Objects.requireNonNull(keyHolder.getKey()).longValue()  ;
-        }
-        catch (Exception e) {
-            throw  new ApiRequestException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR) ;
-        }
-    }
-    public List<ApplicationUser> findEmailAndUserName(String username  , String email ) {
-        var sql = """
-                SELECT * FROM app_user WHERE username = ? OR email = ? ;
-                """ ;
-        return  jdbcTemplate.query(sql,new UserMapper(),username,email) ;
-    }
-    public void deleteAllUsers() {
-        jdbcTemplate.update("delete from app_user ") ;
-    }
-
-    public Optional<ApplicationUser> findUserById(Long id ) {
-        var sql = """
-                    SELECT * FROM app_user 
-                    WHERE id = ? ; 
-                """ ;
-        return jdbcTemplate.query(sql,new UserMapper(),id).stream().findFirst();
     }
 
 
@@ -135,14 +75,17 @@ public class DaoForToDoApplication {
 
     }
 
-    public List<TaskModel> selectAllTaskForUser(Long id) {
+    public List<TaskModel> selectAllTaskForUser(Long id,int page) {
         var sql = """
            SELECT * FROM todo as td 
            JOIN images as img ON  img.task_id = td.id
-           where user_id = ? ;
+           WHERE user_id = ? 
+           OFFSET  ?
+           LIMIT ?
+           ;
                 """ ;
 
-        return jdbcTemplate.query(sql,new ImageTaskMapper(8),id);
+        return jdbcTemplate.query(sql,new ImageTaskMapper(8),id,page*TASKS_PER_PAGE,TASKS_PER_PAGE);
 
     }
 
@@ -187,4 +130,6 @@ public class DaoForToDoApplication {
                 """ ;
         jdbcTemplate.update(sql,image.getName(),image.getType(),image.getImageBytes(),image.getTaskId()) ;
     }
+
+
 }

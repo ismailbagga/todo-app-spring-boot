@@ -1,5 +1,6 @@
 package ismail.coding.todoappspring.services;
-import ismail.coding.todoappspring.dao.DaoForToDoApplication;
+import ismail.coding.todoappspring.dao.TasksDao;
+import ismail.coding.todoappspring.dao.UsersDao;
 import ismail.coding.todoappspring.dto.UpdateTaskRequest;
 import ismail.coding.todoappspring.exception.ApiRequestException;
 import ismail.coding.todoappspring.model.ImageModel;
@@ -22,11 +23,13 @@ import static ismail.coding.todoappspring.security.AuthenticationUtils.getAuthen
 @Slf4j
 public class TasksService {
 
-    private final DaoForToDoApplication daoForToDoApplication;
+    private final TasksDao tasksDao;
+    private final UsersDao usersDao ;
 
     @Autowired
-    public TasksService(DaoForToDoApplication daoForToDoApplication) {
-        this.daoForToDoApplication = daoForToDoApplication;
+    public TasksService(TasksDao tasksDao, UsersDao usersDao) {
+        this.tasksDao = tasksDao;
+        this.usersDao = usersDao;
     }
 
 
@@ -34,10 +37,10 @@ public class TasksService {
         log.info("save a task");
         try {
             var image =  ImageModel.generateImageModel(file) ;
-            if (daoForToDoApplication.findUserById(taskModel.getUserId()).isEmpty())
+            if (usersDao.findUserById(taskModel.getUserId()).isEmpty())
                 throw  new ApiRequestException("user was not found",HttpStatus.EXPECTATION_FAILED);
 
-            daoForToDoApplication.insertTaskWithImage(taskModel,image) ;
+            tasksDao.insertTaskWithImage(taskModel,image) ;
         }
         catch ( IllegalStateException e) {
             throw new ApiRequestException(
@@ -54,15 +57,15 @@ public class TasksService {
         return null  ;
     }
 
-    public List<TaskModel> getAllTasksForUser(Long id) {
-        return  daoForToDoApplication.selectAllTaskForUser(id) ;
+    public List<TaskModel> getAllTasksForUser(Long id,int page) {
+        return  tasksDao.selectAllTaskForUser(id,page) ;
 
 
     }
 
     public TaskModel getTask(Long taskId) {
 
-        Optional<TaskModel> taskModel = daoForToDoApplication.getTaskModel(taskId) ;
+        Optional<TaskModel> taskModel = tasksDao.getTaskModel(taskId) ;
 
         if ( taskModel.isEmpty())
             throw new ApiRequestException("no task was found",HttpStatus.NOT_FOUND) ;
@@ -75,7 +78,7 @@ public class TasksService {
     }
     public void deleteTask(Long taskId ) {
         // check if task exits
-        Optional<TaskModel> task = daoForToDoApplication.getSimpleTask(taskId) ;
+        Optional<TaskModel> task = tasksDao.getSimpleTask(taskId) ;
         if ( task.isEmpty())
             throw new ApiRequestException("there is no task with id of "+taskId,HttpStatus.NOT_FOUND) ;
 
@@ -83,7 +86,7 @@ public class TasksService {
         if (Objects.requireNonNull(getAuthenticatorPrincipal()).getId() != task.get().getUserId() )
             throw new ApiRequestException("accessing a task don't belongs to the user",HttpStatus.BAD_GATEWAY) ;
         //delete  the user
-        daoForToDoApplication.deleteTask(taskId);
+        tasksDao.deleteTask(taskId);
     }
 
 
@@ -94,7 +97,7 @@ public class TasksService {
             throw  new ApiRequestException("request must contain a task id ",HttpStatus.PARTIAL_CONTENT) ;
         // Check if task exists
         Optional<TaskModel> task =
-                daoForToDoApplication.getSimpleTask(request.getTaskId()) ;
+                tasksDao.getSimpleTask(request.getTaskId()) ;
         if ( task.isEmpty())
             throw new ApiRequestException("there is no task with id of "+request.getTaskId(),HttpStatus.NOT_FOUND) ;
         // check if task belong to the user
@@ -117,7 +120,7 @@ public class TasksService {
         }
         if ( updateTaskCount != 3 ) {
             log.info("update user task meta data");
-            daoForToDoApplication.updateTask(request) ;
+            tasksDao.updateTask(request) ;
         }
 
         if (! request.shouldIUpdateImage()) return ;
@@ -125,7 +128,7 @@ public class TasksService {
                 var image =  ImageModel.generateImageModel(request.getImage()) ;
                 image.setTaskId(task.get().getId());
                 log.info("update user image");
-                daoForToDoApplication.updateTaskImage(image) ;
+                tasksDao.updateTaskImage(image) ;
 
         }
         catch ( IllegalStateException e) {
