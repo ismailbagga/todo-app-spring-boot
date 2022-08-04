@@ -1,1 +1,13 @@
-spring
+spring :
+  datasource :
+    url : {{URL}}
+    username : {{DS_USERNAME}}
+    password : {{DS_PASSWORD}}
+    driver-class-name : org.postgresql.Driver
+  servlet:
+    multipart:
+      max-file-size: 1MB
+  jwt:
+    secretKey : {{SECRET_KEY}}
+    expirationDurationInSeconds : 259200000 # 3 days until token is expired
+    jwtPrefix : Bearer
