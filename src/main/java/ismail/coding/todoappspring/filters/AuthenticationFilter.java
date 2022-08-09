@@ -6,6 +6,7 @@ import ismail.coding.todoappspring.dto.UsernamePasswordAuthRequest;
 import ismail.coding.todoappspring.jwt.JwtConfiguration;
 import ismail.coding.todoappspring.model.ApplicationUser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static ismail.coding.todoappspring.jwt.JwtConfiguration.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -37,9 +39,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
+//        String username = request.ge ;
         try {
             ServletInputStream inputStream = request.getInputStream();
-
+//            Arrays.stream(request.getCookies()).forEach(System.out::println);  ;
             UsernamePasswordAuthRequest usernamePasswordAuthRequest =
                     new ObjectMapper().readValue(inputStream,UsernamePasswordAuthRequest.class) ;
             var token =
@@ -64,16 +67,15 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(),tokens);
 
-        log.info("Successful Authentication");
 
     }
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request,
                                               HttpServletResponse response,
                                               AuthenticationException failed) throws IOException, ServletException {
-        //   TODO :  OPTIONAL  ban user after 20 authentication
 
-        response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+        response.setStatus(HttpStatus.FORBIDDEN.value());
+
         log.info("Unsuccessful Authentication");
     }
 

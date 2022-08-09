@@ -1,4 +1,4 @@
-package ismail.coding.todoappspring.security;
+package ismail.coding.todoappspring.config;
 
 import ismail.coding.todoappspring.model.UsernameUserIdPrincipal;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;

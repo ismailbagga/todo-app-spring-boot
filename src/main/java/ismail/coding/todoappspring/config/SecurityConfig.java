@@ -1,19 +1,27 @@
-package ismail.coding.todoappspring.security;
+package ismail.coding.todoappspring.config;
 
 import ismail.coding.todoappspring.filters.*;
 import ismail.coding.todoappspring.jwt.JwtConfiguration;
 import ismail.coding.todoappspring.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 
 @Configuration
@@ -33,12 +41,12 @@ public class SecurityConfig extends  WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         var authenticationFilter = new AuthenticationFilter(authenticationManagerBean(), jwtConfiguration) ;
         var authorizationFilter = new AuthorizationFilter(jwtConfiguration) ;
-        authenticationFilter.setFilterProcessesUrl("/api/v1/login");
+        authenticationFilter.setFilterProcessesUrl("/api/v1/users/login");
         Filter1 filter1 = new Filter1() ;
         Filter2 filter2 = new Filter2() ;
         Filter3 filter3 = new Filter3() ;
 
-
+//        http.cors() ;
         http.csrf().disable() ;
         http.authorizeRequests()
 //                .antMatchers("/api/v1/tasks/**").permitAll()
@@ -53,11 +61,6 @@ public class SecurityConfig extends  WebSecurityConfigurerAdapter {
         http.addFilter(authenticationFilter) ;
         http.addFilterAfter(new Filter1(), UsernamePasswordAuthenticationFilter.class) ;
         http.addFilterBefore(authorizationFilter,Filter1.class) ;
-
-
-
-
-
     }
 
     @Override
@@ -70,6 +73,19 @@ public class SecurityConfig extends  WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        final CorsConfiguration configuration =
+//                new CorsConfiguration() ;
+//        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+//        configuration.setAllowedMethods(List.of("GET"));
+//        configuration.setAllowCredentials(true);
+//        configuration.setAllowedHeaders(List.of("Authorization","Cash-Control","Content-Type"));
+//        var source = new UrlBasedCorsConfigurationSource() ;
+//        source.registerCorsConfiguration("/**",configuration);
+//        return  source ;
+//    }
 
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws  Exception {
         http.sessionManagement(

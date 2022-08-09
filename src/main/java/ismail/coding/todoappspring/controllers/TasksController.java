@@ -13,11 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.Objects;
 
-import static ismail.coding.todoappspring.security.AuthenticationUtils.getAuthenticatorPrincipal;
+import static ismail.coding.todoappspring.config.AuthenticationUtils.getAuthenticatorPrincipal;
 
 @RestController
 @RequestMapping("/api/v1/tasks")

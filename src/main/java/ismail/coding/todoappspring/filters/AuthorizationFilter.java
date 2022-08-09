@@ -28,6 +28,13 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String url = request.getRequestURI();
+        log.info("url i should not filter is {}",url);
+        return url.startsWith("/api/v1/users/login") || url.startsWith("/api/v1/users/save");
+    }
+
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
                                     HttpServletResponse response,

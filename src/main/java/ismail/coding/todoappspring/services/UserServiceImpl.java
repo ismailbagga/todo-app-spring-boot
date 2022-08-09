@@ -5,10 +5,11 @@ import ismail.coding.todoappspring.dto.TokensContainer;
 import ismail.coding.todoappspring.dto.UpdateUserPasswordRequest;
 import ismail.coding.todoappspring.dto.UpdateUserProfileRequest;
 import ismail.coding.todoappspring.dto.UserRequest;
+import ismail.coding.todoappspring.enums.Role;
 import ismail.coding.todoappspring.exception.ApiRequestException;
 import ismail.coding.todoappspring.jwt.JwtConfiguration;
 import ismail.coding.todoappspring.model.ApplicationUser;
-import ismail.coding.todoappspring.security.AuthenticationUtils;
+import ismail.coding.todoappspring.config.AuthenticationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -55,6 +56,7 @@ public class UserServiceImpl implements  UserService , UserDetailsService {
         String email = applicationUser.getEmail()  ;
         validateUsernameAndEmail(username, email,usersDao.findEmailAndUserName(username, email));
         applicationUser.setPassword(passwordEncoder().encode(applicationUser.getPassword()));
+        applicationUser.setRole(Role.USER);
          Long id = usersDao.insertUser(applicationUser);
          applicationUser.setId(id);
          return  jwtConfiguration.generateToken(applicationUser);
@@ -67,7 +69,7 @@ public class UserServiceImpl implements  UserService , UserDetailsService {
             if ( (list.size() == 2)
                     ||
                     (list.get(0).getUsername().equals(username) && list.get(0).getEmail().equals(email) ) )
-                    throw  new ApiRequestException("username and email have been used",HttpStatus.MULTI_STATUS) ;
+                    throw  new ApiRequestException("username and email have been used",HttpStatus.FOUND) ;
 
              if ( list.get(0).getUsername().equals(username)) throw  new ApiRequestException("username is already used",HttpStatus.CONFLICT) ;
              if ( list.get(0).getEmail().equals(email)) throw  new ApiRequestException("email is already used",HttpStatus.CONFLICT) ;

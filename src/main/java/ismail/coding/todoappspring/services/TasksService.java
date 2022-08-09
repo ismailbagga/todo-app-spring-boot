@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static ismail.coding.todoappspring.security.AuthenticationUtils.getAuthenticatorPrincipal;
+import static ismail.coding.todoappspring.config.AuthenticationUtils.getAuthenticatorPrincipal;
 
 @Service
 @Slf4j
