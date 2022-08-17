@@ -17,7 +17,6 @@ public class TaskModel {
     private Date createdAt ;
     private Date updateAt ;
     private ImageModel imageModel ;
-//    private ImageModel image ;
     private  Long userId ;
     private  Boolean completed ;
 

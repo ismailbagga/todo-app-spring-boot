@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UpdateTaskRequest {
     private Long taskId ;
     private  String taskName ;
-    private  String taskDesc ;
+    private  String task_desc ;
     private  Boolean completed ;
     private MultipartFile image ;
 
@@ -23,7 +23,7 @@ public class UpdateTaskRequest {
         return this.taskName != null ;
     }
     public boolean shouldIUpdateTaskDesc() {
-        return this.taskDesc != null  ;
+        return this.task_desc != null  ;
     }
     public boolean shouldIUpdateComplete() {
         return  this.completed != null ;

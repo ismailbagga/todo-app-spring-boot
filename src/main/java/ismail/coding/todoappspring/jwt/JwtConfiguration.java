@@ -55,7 +55,9 @@ public class JwtConfiguration {
                 .withExpiresAt(new Date(System.currentTimeMillis()+expirationDurationInSeconds))
                 .withClaim(AUTHORITIES_CLAIM,authorities)
                 .sign(algorithm) ;
-        return new TokensContainer(accessToken,refreshToken);
+        return new TokensContainer(accessToken,
+                refreshToken,
+                applicationUser.getUsername());
     }
 
     public String extractToken(HttpServletRequest request) {

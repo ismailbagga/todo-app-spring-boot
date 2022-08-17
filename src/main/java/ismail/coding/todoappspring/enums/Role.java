@@ -1,17 +1,14 @@
 package ismail.coding.todoappspring.enums;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import static ismail.coding.todoappspring.enums.UserAuthorities.* ;
 
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public enum Role {
-    USER(Set.of(TASK_READ,TASK_WRITE)) ,
-    ADMIN(Set.of(TASK_READ,TASK_WRITE,USER_WRITE,USER_READ))  ;
+    USER(Set.of(UserAuthorities.TASK_READ, UserAuthorities.TASK_WRITE)) ,
+    ADMIN(Set.of(UserAuthorities.TASK_READ, UserAuthorities.TASK_WRITE, UserAuthorities.USER_WRITE, UserAuthorities.USER_READ))  ;
 
     private  final Set<UserAuthorities> authorities ;
     Role(Set<UserAuthorities> authorities) {

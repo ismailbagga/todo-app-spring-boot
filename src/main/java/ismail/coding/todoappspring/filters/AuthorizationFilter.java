@@ -27,12 +27,12 @@ public class AuthorizationFilter extends OncePerRequestFilter {
         this.jwtConfiguration = jwtConfiguration;
     }
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String url = request.getRequestURI();
-        log.info("url i should not filter is {}",url);
-        return url.startsWith("/api/v1/users/login") || url.startsWith("/api/v1/users/save");
-    }
+//    @Override
+//    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+//        String url = request.getRequestURI();
+//        log.info("url i should not filter is {}",url);
+//        return url.startsWith("/api/v1/users/login") || url.startsWith("/api/v1/users/save");
+//    }
 
     @Override
     protected void doFilterInternal(
@@ -51,7 +51,8 @@ public class AuthorizationFilter extends OncePerRequestFilter {
         DecodedJWT decodedJWT = jwtConfiguration.getDecodedJWT(token) ;
         if ( decodedJWT == null)  {
             log.info("Fake Token");
-            throw  new ServletException("fake token") ;
+            filterChain.doFilter(request,response);
+            return ;
         }
 
         var principal = new UsernameUserIdPrincipal(

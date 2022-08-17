@@ -1,6 +1,7 @@
 package ismail.coding.todoappspring.dao;
 
 import ismail.coding.todoappspring.dto.UpdateTaskRequest;
+import ismail.coding.todoappspring.enums.SearchOrder;
 import ismail.coding.todoappspring.exception.ApiRequestException;
 import ismail.coding.todoappspring.mappers.ImageTaskMapper;
 import ismail.coding.todoappspring.mappers.TaskMapper;
@@ -25,7 +26,7 @@ public class TasksDao {
     private final NamedParameterJdbcTemplate namedJdbcTemplate ;
 
 
-    private final int TASKS_PER_PAGE = 2 ;
+    private final int TASKS_PER_PAGE = 15 ;
 
     @Autowired
     public TasksDao(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate) {
@@ -75,17 +76,36 @@ public class TasksDao {
 
     }
 
-    public List<TaskModel> selectAllTaskForUser(Long id,int page) {
-        var sql = """
+    public List<TaskModel> selectAllTaskForUser(Long id, int page, String q , SearchOrder o , Boolean c) {
+        var map = new MapSqlParameterSource() ;
+        map.addValue("userId",id) ;
+        map.addValue("term",q == null ? "%%" :"%"+q.toLowerCase()+"%") ;
+        map.addValue("c",c) ;
+        map.addValue("order", o == null ? "DESC": o.name()) ;
+        map.addValue("offset",page*TASKS_PER_PAGE) ;
+        map.addValue("limit",TASKS_PER_PAGE) ;
+
+
+        String  evalOrder =  o == null ? "DESC": o.name() ;
+
+        var sql1 = """
            SELECT * FROM todo as td 
            JOIN images as img ON  img.task_id = td.id
-           WHERE user_id = ? 
-           OFFSET  ?
-           LIMIT ?
+           WHERE user_id = :userId 
+           
+           AND  LOWER(task_name) LIKE :term  
+           AND ( cast(:c as boolean ) IS NULL OR completed = :c   )
+           
+           
+           """ ;
+         var sql2 = """ 
+           ORDER BY updated_at     
+                   """ +evalOrder+ """
+          
            ;
                 """ ;
-
-        return jdbcTemplate.query(sql,new ImageTaskMapper(8),id,page*TASKS_PER_PAGE,TASKS_PER_PAGE);
+        var sql = sql1 + sql2 ;
+        return namedJdbcTemplate.query(sql,map,new ImageTaskMapper(8));
 
     }
 
@@ -120,7 +140,7 @@ public class TasksDao {
                 UPDATE todo SET task_name = ? , task_desc = ? , completed = ? ,
                 updated_at = CURRENT_TIMESTAMP WHERE id = ? ;
                 """ ;
-        jdbcTemplate.update(sql,request.getTaskName(),request.getTaskDesc(),request.getCompleted(),request.getTaskId()) ;
+        jdbcTemplate.update(sql,request.getTaskName(),request.getTask_desc(),request.getCompleted(),request.getTaskId()) ;
     }
 
     public void updateTaskImage(ImageModel image) {
@@ -132,4 +152,12 @@ public class TasksDao {
     }
 
 
+    public void likeTask(Long taskId) {
+        var sql = """
+                UPDATE todo SET completed = NOT(completed)  , updated_at = CURRENT_TIMESTAMP 
+                WHERE id = ? ;         
+                """ ;
+        jdbcTemplate.update(sql,taskId) ;
+
+    }
 }

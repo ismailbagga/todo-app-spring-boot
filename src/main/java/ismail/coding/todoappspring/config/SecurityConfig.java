@@ -6,6 +6,7 @@ import ismail.coding.todoappspring.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -46,13 +47,18 @@ public class SecurityConfig extends  WebSecurityConfigurerAdapter {
         Filter2 filter2 = new Filter2() ;
         Filter3 filter3 = new Filter3() ;
 
-//        http.cors() ;
+        http.cors() ;
         http.csrf().disable() ;
         http.authorizeRequests()
 //                .antMatchers("/api/v1/tasks/**").permitAll()
-                .antMatchers("/api/v1/users/save").permitAll()
-                .antMatchers("/api/v1/login").permitAll()
-                .antMatchers("/api/v1/users/public").permitAll() ;
+                .antMatchers(HttpMethod.GET,"/api/v1/users/authentication/state")
+                    .permitAll()
+                .antMatchers("/api/v1/users/save")
+                    .permitAll()
+                .antMatchers("/api/v1/login")
+                    .permitAll()
+                .antMatchers("/api/v1/users/public")
+                    .permitAll() ;
         http.authorizeRequests().anyRequest().authenticated() ;
 
 

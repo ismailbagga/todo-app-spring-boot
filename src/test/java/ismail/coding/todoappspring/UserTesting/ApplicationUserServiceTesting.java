@@ -1,21 +1,5 @@
 package ismail.coding.todoappspring.UserTesting;
 
-import ismail.coding.todoappspring.dao.TasksDao;
-import ismail.coding.todoappspring.enums.Role;
-import ismail.coding.todoappspring.jwt.JwtConfiguration;
-import ismail.coding.todoappspring.model.ApplicationUser;
-import ismail.coding.todoappspring.services.UserServiceImpl;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-
 //@SpringBootTest
 //public class ApplicationUserServiceTesting {
 //    ApplicationUser applicationUser1, applicationUser2, applicationUser3;

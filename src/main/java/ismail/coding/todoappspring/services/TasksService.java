@@ -2,6 +2,7 @@ package ismail.coding.todoappspring.services;
 import ismail.coding.todoappspring.dao.TasksDao;
 import ismail.coding.todoappspring.dao.UsersDao;
 import ismail.coding.todoappspring.dto.UpdateTaskRequest;
+import ismail.coding.todoappspring.enums.SearchOrder;
 import ismail.coding.todoappspring.exception.ApiRequestException;
 import ismail.coding.todoappspring.model.ImageModel;
 import ismail.coding.todoappspring.model.TaskModel;
@@ -57,8 +58,8 @@ public class TasksService {
         return null  ;
     }
 
-    public List<TaskModel> getAllTasksForUser(Long id,int page) {
-        return  tasksDao.selectAllTaskForUser(id,page) ;
+    public List<TaskModel> getAllTasksForUser(Long id, int page, String q , SearchOrder o , Boolean c ) {
+        return  tasksDao.selectAllTaskForUser(id,page,q,o,c) ;
 
 
     }
@@ -91,7 +92,7 @@ public class TasksService {
 
 
     @Transactional
-    public void  updateTask(UpdateTaskRequest request) {
+    public ImageModel updateTask(UpdateTaskRequest request) {
         //Check if request us null
         if (request.getTaskId() == null)
             throw  new ApiRequestException("request must contain a task id ",HttpStatus.PARTIAL_CONTENT) ;
@@ -110,7 +111,7 @@ public class TasksService {
             updateTaskCount++;
         }
         if(  ! request.shouldIUpdateTaskDesc()) {
-             request.setTaskDesc(task.get().getTask_desc());
+             request.setTask_desc(task.get().getTask_desc());
             updateTaskCount++;
 
         }
@@ -123,12 +124,13 @@ public class TasksService {
             tasksDao.updateTask(request) ;
         }
 
-        if (! request.shouldIUpdateImage()) return ;
+        if (! request.shouldIUpdateImage()) return  null ;
         try {
                 var image =  ImageModel.generateImageModel(request.getImage()) ;
                 image.setTaskId(task.get().getId());
                 log.info("update user image");
                 tasksDao.updateTaskImage(image) ;
+                return image ;
 
         }
         catch ( IllegalStateException e) {
@@ -145,8 +147,15 @@ public class TasksService {
         // check if there is nothing to update then skip
     }
 
+    public void likeTask(Long taskId) {
+        var principal =   getAuthenticatorPrincipal() ;
+        TaskModel task =
+                tasksDao.getSimpleTask(taskId).orElseThrow(
+                        ()-> new ApiRequestException("task was not found",HttpStatus.NOT_FOUND)) ;
+        if (task.getUserId() != principal.getId())
+            throw  new ApiRequestException("not authorize",HttpStatus.FORBIDDEN) ;
 
+        tasksDao.likeTask(taskId) ;
 
-
-    ;
+    }
 }
